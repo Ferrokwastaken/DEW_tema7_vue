@@ -34,7 +34,9 @@ defineEmits(['addToCart'])
       </tr>
     </thead>
     <tbody>
-      <tr v-for="product in filteredProducts" :key="product.id">
+      <tr v-for="product in filteredProducts" :key="product.id"
+      :class = "{warning: product.category == 'Alcoholic'}"
+      >
         <td>{{ product.id }}</td>
         <td>{{ product.name }}</td>
         <td>{{ product.price }}</td>
@@ -79,5 +81,9 @@ defineEmits(['addToCart'])
     color: #fff;
     border: none;
     cursor: pointer;
+  }
+
+  tr.warning {
+    background-color: #f33;
   }
 </style>

@@ -77,4 +77,8 @@ const cartProducts = computed(() => {
     padding: 0.5rem;
     font-size: 1rem;
   }
+
+  .warning {
+    background-color: #f33;
+  }
 </style>
