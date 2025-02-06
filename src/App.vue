@@ -7,6 +7,7 @@ import ShoppingCart from './components/ShoppingCart.vue'
 const username = ref('Israel')
 const products = ref([])
 const cartIDs = ref([])
+const orderField = ref('name')
 
 onMounted(async () => {
   const res = await fetch('http://localhost:3000/api/products')
@@ -51,6 +52,32 @@ const cartProducts = computed(() => {
   })
 })
 
+const sortProducts = computed(() => {
+  if (orderField.value == 'name') {
+    return products.value.sort((a, b) => a.name.localeCompare(b.name)) 
+  } else {
+    return products.value.sort((a, b) => a.price - b.price)
+  }
+})
+
+async function deleteProduct(id) {
+  console.log('Eliminando producto', id)
+  try {
+    const res = await fetch('http://localhost:3000/api/products/' + id, {
+      method: 'DELETE'
+    })
+    if (res.ok) {
+      console.log('Producto eliminado')
+      removeFromCart(id)
+      products.value = products.value.filter(p => p.id != id)
+    } else {
+      throw new Error("Error al eliminar el producto");
+    }
+  } catch (error) {
+    console.log('Error de los gordos', error)
+  }
+}
+
 </script>
 
 <template>
@@ -58,10 +85,19 @@ const cartProducts = computed(() => {
   <p><input type="text" v-model="username"></p>
   <p>Bienvenido {{ username }}</p>
   <p>Elementos del carrito: {{ cartIDs.length }}</p>
+  <p>
+    Ordenar por:
+    <input type="radio" v-model="orderField" value="name" id="order-name">
+    <label for="order-name">Nombre</label>
+    <input type="radio" v-model="orderField" value="price" id="order-price">
+    <label for="order-price">Precio</label>
+  </p>
   <ShoppingCart :cartIDs="cartProducts" @removeFromCart="removeFromCart"
   @increaseAmount="increaseAmount" @decreaseAmount="decreaseAmount"
   />
-  <ListProducts :products="products" @addToCart="addToCart"/>
+  <ListProducts :products="sortProducts" @addToCart="addToCart"
+  @deleteProduct="deleteProduct"
+  />
 </template>
 
 <style scoped>

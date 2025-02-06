@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { computed } from 'vue'
+import { onMounted } from 'vue'
 
 const searchWord = ref('')
+const searchCategory = ref('')
+const categories = ref([])
 
 const props = defineProps({
   products: Array
@@ -10,11 +13,17 @@ const props = defineProps({
 
 const filteredProducts = computed(() => {
   return props.products.filter(product => {
-    return product.name.toLocaleLowerCase().includes(searchWord.value.toLocaleLowerCase())
+    return product.name.toLowerCase().includes(searchWord.value.toLowerCase())
+      && (searchCategory.value == "" || product.category == searchCategory.value)
   })
 })
 
-defineEmits(['addToCart'])
+defineEmits(['addToCart'], ['deleteProduct'])
+
+onMounted(async () => {
+  const res = await fetch('http://localhost:3000/api/categories')
+  categories.value = await res.json()
+})
 
 </script>
 
@@ -22,6 +31,14 @@ defineEmits(['addToCart'])
   <h1>Listado de Productos</h1>
   <p>Filtrar por
     <input type="text" v-model="searchWord">
+  </p>
+  <p>Seleccionar categoría
+    <select v-model="searchCategory">
+      <option value="">Todas</option>
+      <option v-for="(category, index) in categories" :key="index">
+        {{ category }}
+      </option>
+    </select>
   </p>
   <table>
     <thead>
@@ -43,6 +60,7 @@ defineEmits(['addToCart'])
         <td>{{ product.category }}</td>
         <td>
           <button @click="$emit('addToCart', product.id)">Añadir al carrito</button>
+          <button @click="$emit('deleteProduct', product.id)">Eliminar Producto</button>
         </td>
       </tr>
     </tbody>
@@ -81,6 +99,8 @@ defineEmits(['addToCart'])
     color: #fff;
     border: none;
     cursor: pointer;
+    margin-right: 1px;
+    margin-left: 1px;
   }
 
   tr.warning {
