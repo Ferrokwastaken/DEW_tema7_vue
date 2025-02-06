@@ -71,4 +71,13 @@ defineEmits(['addToCart'])
   tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+
+  button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
 </style>
